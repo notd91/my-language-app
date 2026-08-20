@@ -54,7 +54,7 @@ export default function Home() {
     setIsAnalyzing(true);
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const prompt = "작품명: " + mediaTitle + "\n대본/내용: " + scriptText.slice(0, 1000) + "\n위 정보를 바탕으로 대화 가능한 주요 등장인물 3~5명의 이름만 쉼표(,)로 구분하여 응답해줘. 예시: Sherlock Holmes, Dr. John Watson, Jim Moriarty";
 
@@ -91,7 +91,7 @@ export default function Home() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const systemInstruction = "You are '" + selectedCharacter + "' from '" + mediaTitle + "'. Language to converse in: " + language + ". Always maintain your persona strictly. Mode: " + (mode === "beginner" ? "Use simple words and clear sentences." : "Speak naturally as a native speaker.");
 
@@ -152,7 +152,7 @@ export default function Home() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const historyText = messages.map((m) => m.sender + ": " + m.text).join("\n");
       const prompt = "다음 대화 내역을 바탕으로 사용자의 " + language + " 언어 학습 피드백을 JSON 형식으로만 응답해줘.\n{\n  \"grammar\": [\"문법적 오류 교정\"],\n  \"betterExpressions\": [\"더 자연스러운 표현\"],\n  \"tips\": \"총평 팁\"\n}\n\n대화 내역:\n" + historyText;
@@ -307,4 +307,82 @@ export default function Home() {
 
           <div className="mt-4 pt-3 border-t border-slate-800 space-y-3">
             <div className="flex justify-center items-center gap-2 h-6">
-              {isAiSpeaking && <span className="text-xs text-indigo
+              {isAiSpeaking && <span className="text-xs text-indigo-400 animate-pulse">🔊 AI가 말하는 중...</span>}
+              {isRecording && <span className="text-xs text-red-400 animate-pulse">🎙️ 듣고 있는 중... 말해보세요!</span>}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleRecording}
+                className={`p-3.5 rounded-full text-white transition ${
+                  isRecording ? "bg-red-600 animate-bounce" : "bg-indigo-600 hover:bg-indigo-500"
+                }`}
+              >
+                {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+              <input
+                type="text"
+                placeholder="텍스트 입력..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500"
+              />
+              <button onClick={() => handleSendMessage()} className="bg-slate-800 border border-slate-700 p-3 rounded-xl hover:bg-slate-700">
+                <Send className="w-5 h-5 text-indigo-400" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {step === "feedback" && (
+        <div className="flex-1 flex flex-col justify-center gap-4 my-6">
+          <div className="text-center space-y-1">
+            <Award className="w-10 h-10 text-amber-400 mx-auto" />
+            <h2 className="text-lg font-bold">학습 피드백 리포트</h2>
+          </div>
+
+          {!feedback ? (
+            <div className="text-center py-12 text-slate-400">
+              <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2 text-indigo-400" />
+              피드백 분석 중입니다...
+            </div>
+          ) : (
+            <div className="space-y-3 text-sm">
+              <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <h3 className="font-bold text-amber-300 mb-2">🟢 문법 교정</h3>
+                <ul className="list-disc list-inside space-y-1 text-slate-300">
+                  {feedback.grammar?.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <h3 className="font-bold text-indigo-300 mb-2">🔵 더 자연스러운 현지 표현</h3>
+                <ul className="list-disc list-inside space-y-1 text-slate-300">
+                  {feedback.betterExpressions?.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <h3 className="font-bold text-emerald-300 mb-1">💡 총평 팁</h3>
+                <p className="text-slate-300">{feedback.tips}</p>
+              </div>
+
+              <button
+                onClick={() => setStep("setup")}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 font-semibold py-3 rounded-xl transition mt-2"
+              >
+                새 대화 시작하기
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </main>
+  );
+}
