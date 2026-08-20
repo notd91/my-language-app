@@ -54,7 +54,7 @@ export default function Home() {
     setIsAnalyzing(true);
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const prompt = "작품명: " + mediaTitle + "\n대본/내용: " + scriptText.slice(0, 1000) + "\n위 정보를 바탕으로 대화 가능한 주요 등장인물 3~5명의 이름만 쉼표(,)로 구분하여 응답해줘. 예시: Sherlock Holmes, Dr. John Watson, Jim Moriarty";
 
@@ -63,7 +63,7 @@ export default function Home() {
       setCharacters(charList);
       setStep("character_select");
     } catch (error) {
-      alert("분석에 실패했습니다. API 키나 크롬 콘솔 에러를 확인해주세요.");
+      alert("분석에 실패했습니다. API 키가 올바른지, Google AI Studio에서 생성한 키가 맞는지 확인해주세요.");
       console.error(error);
     } finally {
       setIsAnalyzing(false);
@@ -91,7 +91,7 @@ export default function Home() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const systemInstruction = "You are '" + selectedCharacter + "' from '" + mediaTitle + "'. Language to converse in: " + language + ". Always maintain your persona strictly. Mode: " + (mode === "beginner" ? "Use simple words and clear sentences." : "Speak naturally as a native speaker.");
 
@@ -152,7 +152,7 @@ export default function Home() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const historyText = messages.map((m) => m.sender + ": " + m.text).join("\n");
       const prompt = "다음 대화 내역을 바탕으로 사용자의 " + language + " 언어 학습 피드백을 JSON 형식으로만 응답해줘.\n{\n  \"grammar\": [\"문법적 오류 교정\"],\n  \"betterExpressions\": [\"더 자연스러운 표현\"],\n  \"tips\": \"총평 팁\"\n}\n\n대화 내역:\n" + historyText;
