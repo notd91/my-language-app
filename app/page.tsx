@@ -106,7 +106,7 @@ export default function Home() {
       `;
 
       const chatPrompt = `${systemInstruction}\n\nChat History:\n${newMessages
-        .map((m) => `${m.sender}:${m.text}`)
+        .map((m) => `${m.sender}: ${m.text}`)
         .join("\n")}\nai:`;
 
       const result = await model.generateContent(chatPrompt);
@@ -175,7 +175,7 @@ export default function Home() {
         }
 
         대화 내역:
-        ${messages.map((m) => `${m.sender}:${m.text}`).join("\n")}
+        ${messages.map((m) => `${m.sender}: ${m.text}`).join("\n")}
       `;
 
       const result = await model.generateContent(prompt);
@@ -361,4 +361,49 @@ export default function Home() {
         <div className="flex-1 flex flex-col justify-center gap-4 my-6">
           <div className="text-center space-y-1">
             <Award className="w-10 h-10 text-amber-400 mx-auto" />
-            <h2 className
+            <h2 className="text-lg font-bold">학습 피드백 리포트</h2>
+          </div>
+
+          {!feedback ? (
+            <div className="text-center py-12 text-slate-400">
+              <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2 text-indigo-400" />
+              피드백 분석 중입니다...
+            </div>
+          ) : (
+            <div className="space-y-3 text-sm">
+              <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <h3 className="font-bold text-amber-300 mb-2">🟢 문법 교정</h3>
+                <ul className="list-disc list-inside space-y-1 text-slate-300">
+                  {feedback.grammar?.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <h3 className="font-bold text-indigo-300 mb-2">🔵 더 자연스러운 현지 표현</h3>
+                <ul className="list-disc list-inside space-y-1 text-slate-300">
+                  {feedback.betterExpressions?.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <h3 className="font-bold text-emerald-300 mb-1">💡 총평 팁</h3>
+                <p className="text-slate-300">{feedback.tips}</p>
+              </div>
+
+              <button
+                onClick={() => setStep("setup")}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 font-semibold py-3 rounded-xl transition mt-2"
+              >
+                새 대화 시작하기
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </main>
+  );
+}
